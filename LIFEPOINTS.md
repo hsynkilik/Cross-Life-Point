@@ -1,155 +1,156 @@
 # CrossPoint + LifePoints
 
-Dieser Fork ist das offizielle [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader) 2.0.0
-mit **einem zusätzlichen Menüpunkt: LifePoints**, einem Lebenspunkte-Zähler für zwei Spieler
-(gedacht für **Flesh and Blood**, funktioniert aber für jedes Kartenspiel mit Lebenspunkten).
+This fork is the official [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader) 2.0.0
+with **one extra menu entry: LifePoints**, a two-player life counter
+(made for **Flesh and Blood**, but it works for any card game that tracks life).
 
-Alles andere von CrossPoint (Bücher lesen, Bibliothek, Dateiübertragung, Einstellungen, Themes)
-bleibt **unverändert** erhalten.
+Everything else in CrossPoint (reading, library, file transfer, settings, themes)
+stays **unchanged**.
 
-Getestet auf: **Xteink X4** (ESP32-C3, 800×480 E-Ink, 16 MB Flash).
+Tested on: **Xteink X4** (ESP32-C3, 800×480 e-ink, 16 MB flash).
+
+This is an unofficial fork. It is not supported by the CrossPoint team.
 
 ---
 
-## Was LifePoints kann
+## What LifePoints does
 
-- Zwei Spieler, beide starten mit **40** Lebenspunkten.
-- Gerät liegt im **Hochformat** zwischen den Spielern, die 4 Fronttasten unten.
-- **Obere Hälfte** = oberer Spieler, **untere Hälfte** = unterer Spieler, getrennt durch eine Linie.
-- Riesige schwarze Zahlen, **seitlich gedreht**, damit jeder Spieler seine Zahl lesen kann
-  (oben 90° gegen den Uhrzeigersinn, unten 90° im Uhrzeigersinn).
-- Unten kleine Kreise mit **− + + −** direkt über den Tasten, sonst keine Texte.
-- **Änderungsanzeige:** 2 Sekunden nach dem letzten Tastendruck erscheint klein unter der Zahl,
-  um wie viel sie sich insgesamt geändert hat (z. B. **−7** oder **+2**). Drücke kurz
-  hintereinander werden zusammengezählt. Die Anzeige bleibt stehen, bis dieser Spieler wieder
-  etwas ändert.
-- Der Spielstand bleibt erhalten, wenn man kurz ins Hauptmenü geht
-  (aber nicht, wenn das Gerät schlafen geht oder neu startet).
+- Two players, both start at **40** life.
+- The device lies in **portrait** between the players, with the 4 front buttons at the bottom.
+- **Top half** = top player, **bottom half** = bottom player, separated by a line.
+- Huge black numbers, **rotated sideways** so each player can read their own total
+  (top: 90° counter-clockwise, bottom: 90° clockwise).
+- Small circles with **− + + −** right above the buttons, no other text.
+- **Change indicator:** 2 seconds after the last button press, a small number under the total
+  shows how much it changed in total (for example **−7** or **+2**). Presses in quick
+  succession are added up. The indicator stays until that player changes their total again.
+- The game state survives a quick trip to the home menu
+  (but not sleep or a restart).
 
-Den Menüpunkt findest du im Hauptmenü ganz unten („LifePoints“), im **Lyra-Theme** mit einem
-Pixel-Herz davor. Im **Cover-Grid-Theme** ist es das **Pixel-Herz** in der unteren Leiste.
+You find the entry at the bottom of the home menu ("LifePoints"), with a pixel heart in front of it
+in the **Lyra theme**. In the **Cover Grid theme** it is the **pixel heart** in the bottom bar.
 
-## Bedienung
+## Controls
 
-Tasten 1–4 = die vier Fronttasten **von links nach rechts**.
+Buttons 1–4 = the four front buttons **from left to right**.
 
-| Taste | Kreis | Wirkung |
+| Button | Circle | Action |
 |---|---|---|
-| 1 | − | unterer Spieler −1 |
-| 2 | + | unterer Spieler +1 |
-| 3 | + | oberer Spieler +1 |
-| 4 | − | oberer Spieler −1 |
+| 1 | − | bottom player −1 |
+| 2 | + | bottom player +1 |
+| 3 | + | top player +1 |
+| 4 | − | top player −1 |
 
-- **Kurz drücken** = 1 Punkt.
-- **Halten (ab 0,6 Sekunden)** = 5 Punkte, zählt einmal beim Loslassen.
-- **Reset auf 40/40:** eine **Seitentaste 1 Sekunde gedrückt halten**.
-- **Zurück ins Hauptmenü:** Tasten **1, 4, 1, 4** kurz hintereinander (innerhalb von 3 Sekunden).
-  Die Punkte, die sich dabei geändert haben, werden automatisch zurückgesetzt.
+- **Short press** = 1 point.
+- **Hold (0.6 seconds or longer)** = 5 points, applied once on release.
+- **Reset to 40/40:** **hold a side button for 1 second**.
+- **Back to the home menu:** press **1, 4, 1, 4** quickly (within 3 seconds).
+  Any life changes made by these presses are undone automatically.
 
-**Bildschirm:**
+**Screen refresh:**
 
 | Situation | Refresh |
 |---|---|
-| LifePoints öffnen | voll (einmal kräftiges Blinken) |
-| Reset über die Seitentaste | voll |
-| Lebenspunkte ändern sich | schnell |
-| Änderungsanzeige erscheint | schnell |
-| Taste ohne Wirkung (z. B. schon bei 0) | keiner |
+| Opening LifePoints | full (one strong flash) |
+| Reset with the side button | full |
+| Life total changes | fast |
+| Change indicator appears | fast |
+| Button press with no effect (e.g. already at 0) | none |
 
-Nach sehr vielen schnellen Refreshes können leichte Schatten alter Zahlen bleiben.
-Ein Reset oder einmal raus und wieder rein in LifePoints macht den Bildschirm wieder sauber.
+After a lot of fast refreshes, faint ghosts of old numbers may remain.
+A reset, or leaving and reopening LifePoints, cleans the screen again.
 
-### Warum Reset über die Seitentaste?
+### Why reset with the side button?
 
-Ursprünglich war „Taste 2 und 3 gleichzeitig“ geplant. Beim X4 hängen aber alle vier Fronttasten
-an **einem einzigen Messeingang** (Widerstandsleiter am ADC). Zwei gleichzeitig gedrückte Tasten
-ergeben einen Mischwert, der als eine einzelne, falsche Taste erkannt wird. Die Seitentasten hängen
-an einem eigenen Eingang und werden deshalb sicher erkannt.
+The original plan was "press buttons 2 and 3 together". On the X4, however, all four front buttons
+share **a single analog input** (a resistor ladder on one ADC pin). Two buttons pressed at once
+produce a mixed value that is read as one single, wrong button. The side buttons use a separate
+input, so they are detected reliably.
 
 ---
 
-## Installieren
+## Install
 
-Die fertige Firmware gibt es unter **[Releases](../../releases)** als `custom.bin`.
-Das ist ein App-Image für Adresse **0x10000** (kein komplettes Flash-Abbild).
+The ready-made firmware is available under **[Releases](../../releases)** as `custom.bin`.
+It is an app image for address **0x10000** (not a full flash image).
 
-### Weg 1: über die SD-Karte (am einfachsten)
+### Option 1: via SD card (easiest)
 
-1. `custom.bin` auf die SD-Karte des X4 kopieren.
-2. Am Gerät in CrossPoint: **Einstellungen → System → SD-Karte Firmware Update**
-   (englisch: *Settings → System → SD Card Firmware Update*) und die Datei auswählen.
+1. Copy `custom.bin` to the X4's SD card.
+2. On the device in CrossPoint: **Settings → System → SD Card Firmware Update**
+   and select the file.
 
-CrossPoint kümmert sich dabei selbst darum, in welchen Programmbereich geschrieben wird.
+CrossPoint itself takes care of which app partition gets written.
 
-### Weg 2: per USB mit esptool (Mac/PC)
+### Option 2: via USB with esptool (Mac/PC)
 
-Vorher **unbedingt ein Backup** machen (siehe unten). Dann:
+**Make a backup first** (see below). Then:
 
 ```bash
 esptool --chip esp32c3 write-flash 0x10000 custom.bin
 ```
 
-Hinweis: Das funktioniert direkt nur, wenn auf dem Gerät gerade der Bereich `app0` aktiv ist.
-Nach früheren Online-Updates kann `app1` aktiv sein; dann ist Weg 1 einfacher.
+Note: this only works directly if partition `app0` is currently active on the device.
+After earlier online updates `app1` may be active; in that case option 1 is easier.
 
-## Backup und Wiederherstellung
+## Backup and restore
 
-**Backup** des kompletten 16-MB-Speichers (liest nur, ändert nichts):
+**Backup** of the full 16 MB flash (read-only, changes nothing):
 
 ```bash
 esptool --chip esp32c3 --no-stub read-flash 0 0x1000000 backup_x4_16MB.bin
 ```
 
-`--no-stub` ist langsamer, war beim X4 aber nötig: Mit dem schnellen Hilfs-Lader brach das Lesen
-bei Adresse 0x140000 jedes Mal ab.
+`--no-stub` is slower but was needed on the X4: with the fast stub loader, reading stopped
+at address 0x140000 every time.
 
-**Wiederherstellen** (schreibt das Gerät exakt in den alten Zustand zurück):
+**Restore** (writes the device back to exactly its old state):
 
 ```bash
 esptool --chip esp32c3 write-flash 0 backup_x4_16MB.bin
 ```
 
-Reagiert das Gerät nicht: Power-Taste gedrückt halten, kurz Reset drücken, Power loslassen
-(Download-Modus), dann den Befehl erneut ausführen.
+If the device does not respond: hold the power button, briefly press reset, release power
+(download mode), then run the command again.
 
-Das Backup gehört **nicht** ins Internet: Es kann WLAN-Passwörter und Anmeldedaten enthalten.
+Do **not** upload the backup anywhere public: it can contain Wi-Fi passwords and login data.
 
 ---
 
-## Selbst bauen
+## Build it yourself
 
-Gebaut wird mit PlatformIO, Umgebung `gh_release`:
+Build with PlatformIO, environment `gh_release`:
 
 ```bash
 pio run -e gh_release
 ```
 
-Ergebnis: `.pio/build/gh_release/firmware.bin` (das ist die `custom.bin`).
+Output: `.pio/build/gh_release/firmware.bin` (this is the `custom.bin`).
 
-Zwei Stolperfallen auf dem Mac:
+Two pitfalls on macOS:
 
-- Der Projektordner darf **keine Leerzeichen** im Pfad haben (ESP-IDF bricht sonst ab).
-- PlatformIO Core **6.2.0** bricht mit `No module named 'SCons.Tool.FortranCommon'` ab.
-  Lösung (wie im offiziellen CI): Core 6.1.19 in PlatformIOs eigener Python-Umgebung installieren:
+- The project folder path must **not contain spaces** (ESP-IDF aborts otherwise).
+- PlatformIO Core **6.2.0** fails with `No module named 'SCons.Tool.FortranCommon'`.
+  Fix (same as the official CI): install core 6.1.19 into PlatformIO's own Python environment:
   ```bash
   ~/.platformio/penv/bin/python -m pip install "pioarduino==6.1.19"
   ```
-  Danach einmal `.pio/libdeps/gh_release` löschen und neu bauen.
+  Then delete `.pio/libdeps/gh_release` once and build again.
 
-## Was im Code geändert wurde
+## What changed in the code
 
-| Datei | Änderung |
+| File | Change |
 |---|---|
-| `src/activities/lifepoints/LifePointsActivity.*` | **neu**: der Zähler (Tasten, Anzeige, Refresh) |
-| `src/components/icons/heart.h` | **neu**: Pixel-Herz für Cover-Grid und Lyra-Theme |
-| `src/components/icons/customListIcons.h`, `src/components/UiAppHelpers.h` | Pixel-Herz für Listen-Menüs |
-| `src/components/themes/BaseTheme.h`, `src/components/themes/lyra/LyraTheme.cpp` | neues Symbol `Heart` |
-| `src/activities/ActivityManager.h` | Menüpunkt `LIFEPOINTS` ergänzt |
-| `src/activities/home/HomeActivity.*` | Menüpunkt im Hauptmenü |
-| `src/components/CoverGridHomeUi.*` | sechstes Symbol (Herz) im Cover-Grid |
+| `src/activities/lifepoints/LifePointsActivity.*` | **new**: the counter (buttons, display, refresh) |
+| `src/components/icons/heart.h` | **new**: pixel heart for Cover Grid and Lyra theme |
+| `src/components/icons/customListIcons.h`, `src/components/UiAppHelpers.h` | pixel heart for list menus |
+| `src/components/themes/BaseTheme.h`, `src/components/themes/lyra/LyraTheme.cpp` | new icon `Heart` |
+| `src/activities/ActivityManager.h` | added menu entry `LIFEPOINTS` |
+| `src/activities/home/HomeActivity.*` | menu entry in the home menu |
+| `src/components/CoverGridHomeUi.*` | sixth icon (heart) in the Cover Grid |
 
-Zweige in diesem Repo:
+Branches in this repo:
 
-- `lifepoints` – diese Version (Standard)
-- `base-2.0.0` – das unveränderte offizielle CrossPoint 2.0.0
-- `develop` – Stand des offiziellen Repos zum Zeitpunkt des Forks
+- `lifepoints` – this version (default)
+- `base-2.0.0` – the unchanged official CrossPoint 2.0.0
+- `develop` – the official repo's state at the time of the fork
