@@ -18,6 +18,7 @@
 #include "components/icons/bookmark.h"
 #include "components/icons/cover.h"
 #include "components/icons/folder.h"
+#include "components/icons/heart.h"
 #include "components/icons/hotspot.h"
 #include "components/icons/library.h"
 #include "components/icons/recent.h"
@@ -60,6 +61,8 @@ const uint8_t* iconForName(UIIcon icon) {
       return BookmarkIcon;
     case UIIcon::Blocks:
       return BlocksIcon;
+    case UIIcon::Heart:
+      return HeartIcon;
     default:
       return nullptr;
   }

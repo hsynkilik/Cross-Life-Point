@@ -19,11 +19,15 @@ Getestet auf: **Xteink X4** (ESP32-C3, 800×480 E-Ink, 16 MB Flash).
 - Riesige schwarze Zahlen, **seitlich gedreht**, damit jeder Spieler seine Zahl lesen kann
   (oben 90° gegen den Uhrzeigersinn, unten 90° im Uhrzeigersinn).
 - Unten kleine Kreise mit **− + + −** direkt über den Tasten, sonst keine Texte.
+- **Änderungsanzeige:** 1 Sekunde nach dem letzten Tastendruck erscheint klein unter der Zahl,
+  um wie viel sie sich insgesamt geändert hat (z. B. **−7** oder **+2**). Drücke kurz
+  hintereinander werden zusammengezählt. Die Anzeige bleibt stehen, bis dieser Spieler wieder
+  etwas ändert.
 - Der Spielstand bleibt erhalten, wenn man kurz ins Hauptmenü geht
   (aber nicht, wenn das Gerät schlafen geht oder neu startet).
 
-Den Menüpunkt findest du im Hauptmenü ganz unten („LifePoints“).
-Im **Cover-Grid-Theme** ist es das **Herz-Symbol** in der unteren Leiste.
+Den Menüpunkt findest du im Hauptmenü ganz unten („LifePoints“), im **Lyra-Theme** mit einem
+Pixel-Herz davor. Im **Cover-Grid-Theme** ist es das **Pixel-Herz** in der unteren Leiste.
 
 ## Bedienung
 
@@ -42,9 +46,18 @@ Tasten 1–4 = die vier Fronttasten **von links nach rechts**.
 - **Zurück ins Hauptmenü:** Tasten **1, 4, 1, 4** kurz hintereinander (innerhalb von 3 Sekunden).
   Die Punkte, die sich dabei geändert haben, werden automatisch zurückgesetzt.
 
-**Bildschirm:** Nach jeder Eingabe wird nur der Inhalt schnell neu gezeichnet.
-Nach 10 Änderungen und beim Reset blinkt der Bildschirm einmal kräftig (voller Refresh),
-damit keine Schatten zurückbleiben. Das ist gewollt.
+**Bildschirm:**
+
+| Situation | Refresh |
+|---|---|
+| LifePoints öffnen | voll (einmal kräftiges Blinken) |
+| Reset über die Seitentaste | voll |
+| Lebenspunkte ändern sich | schnell |
+| Änderungsanzeige erscheint | schnell |
+| Taste ohne Wirkung (z. B. schon bei 0) | keiner |
+
+Nach sehr vielen schnellen Refreshes können leichte Schatten alter Zahlen bleiben.
+Ein Reset oder einmal raus und wieder rein in LifePoints macht den Bildschirm wieder sauber.
 
 ### Warum Reset über die Seitentaste?
 
@@ -128,7 +141,9 @@ Zwei Stolperfallen auf dem Mac:
 | Datei | Änderung |
 |---|---|
 | `src/activities/lifepoints/LifePointsActivity.*` | **neu**: der Zähler (Tasten, Anzeige, Refresh) |
-| `src/components/icons/heart.h` | **neu**: Herz-Symbol für das Cover-Grid-Theme |
+| `src/components/icons/heart.h` | **neu**: Pixel-Herz für Cover-Grid und Lyra-Theme |
+| `src/components/icons/customListIcons.h`, `src/components/UiAppHelpers.h` | Pixel-Herz für Listen-Menüs |
+| `src/components/themes/BaseTheme.h`, `src/components/themes/lyra/LyraTheme.cpp` | neues Symbol `Heart` |
 | `src/activities/ActivityManager.h` | Menüpunkt `LIFEPOINTS` ergänzt |
 | `src/activities/home/HomeActivity.*` | Menüpunkt im Hauptmenü |
 | `src/components/CoverGridHomeUi.*` | sechstes Symbol (Herz) im Cover-Grid |
