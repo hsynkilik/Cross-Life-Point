@@ -7,7 +7,7 @@
 
 // Two-player life counter (Flesh and Blood). Portrait, players face each
 // other across the long sides: player 1 owns the top half, player 2 the bottom.
-// Front keys 1-4 (left to right): P1 -, P1 +, P2 +, P2 -.
+// Front keys 1-4 (left to right): P2 -, P2 +, P1 +, P1 -.
 // Short press = 1, hold >= 600 ms = 5 (applied once on release).
 // Hold a side key >= 1 s: reset both to 40. Short presses 1,4,1,4 within 3 s:
 // undo those four presses and return home.

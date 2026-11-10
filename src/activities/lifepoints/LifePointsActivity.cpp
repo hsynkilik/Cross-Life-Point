@@ -129,17 +129,18 @@ void LifePointsActivity::markChanged(const bool forceFull) {
 void LifePointsActivity::applyPress(const int key, const bool longPress) {
   const int amount = longPress ? 5 : 1;
   switch (key) {
+    // Keys 1-2 sit under the bottom player (life2), keys 3-4 serve the top one.
     case 0:
-      life1 = std::max(0, life1 - amount);
+      life2 = std::max(0, life2 - amount);
       break;
     case 1:
-      life1 = std::min(MAX_LIFE, life1 + amount);
-      break;
-    case 2:
       life2 = std::min(MAX_LIFE, life2 + amount);
       break;
+    case 2:
+      life1 = std::min(MAX_LIFE, life1 + amount);
+      break;
     case 3:
-      life2 = std::max(0, life2 - amount);
+      life1 = std::max(0, life1 - amount);
       break;
     default:
       return;
