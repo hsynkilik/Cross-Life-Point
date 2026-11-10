@@ -15,7 +15,7 @@ constexpr int MAX_LIFE = 999;
 constexpr unsigned long LONG_PRESS_MS = 600;
 constexpr unsigned long RESET_HOLD_MS = 1000;
 constexpr unsigned long EXIT_WINDOW_MS = 3000;
-constexpr unsigned long DELTA_DELAY_MS = 1000;
+constexpr unsigned long DELTA_DELAY_MS = 2000;
 
 // Physical front keys, left to right.
 constexpr uint8_t FRONT_KEY[4] = {HalGPIO::BTN_BACK, HalGPIO::BTN_CONFIRM, HalGPIO::BTN_LEFT, HalGPIO::BTN_RIGHT};
@@ -226,8 +226,12 @@ void LifePointsActivity::loop() {
     markChanged(true);
   }
 
-  // Show a player's summed change once they stopped pressing for 1 s.
+  // Show a player's summed change once they stopped pressing for 2 s. The
+  // wait restarts on release and is paused while one of their keys is down,
+  // so a hold (5) followed by short presses still adds up to one change.
   for (int p = 0; p < 2; ++p) {
+    const bool keyDown = p == 1 ? (pressActive[0] || pressActive[1]) : (pressActive[2] || pressActive[3]);
+    if (keyDown) continue;
     if (deltaPending[p] && now - lastChange[p] >= DELTA_DELAY_MS) {
       deltaPending[p] = false;
       if (pendingDelta[p] != 0) {

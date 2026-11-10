@@ -19,7 +19,7 @@ Getestet auf: **Xteink X4** (ESP32-C3, 800×480 E-Ink, 16 MB Flash).
 - Riesige schwarze Zahlen, **seitlich gedreht**, damit jeder Spieler seine Zahl lesen kann
   (oben 90° gegen den Uhrzeigersinn, unten 90° im Uhrzeigersinn).
 - Unten kleine Kreise mit **− + + −** direkt über den Tasten, sonst keine Texte.
-- **Änderungsanzeige:** 1 Sekunde nach dem letzten Tastendruck erscheint klein unter der Zahl,
+- **Änderungsanzeige:** 2 Sekunden nach dem letzten Tastendruck erscheint klein unter der Zahl,
   um wie viel sie sich insgesamt geändert hat (z. B. **−7** oder **+2**). Drücke kurz
   hintereinander werden zusammengezählt. Die Anzeige bleibt stehen, bis dieser Spieler wieder
   etwas ändert.

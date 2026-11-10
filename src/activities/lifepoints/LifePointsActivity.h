@@ -11,7 +11,7 @@
 // Short press = 1, hold >= 600 ms = 5 (applied once on release).
 // Hold a side key >= 1 s: reset both to 40. Short presses 1,4,1,4 within 3 s:
 // undo those four presses and return home.
-// 1 s after a player's last press, a small "+N"/"-N" under the total shows the
+// 2 s after a player's last press, a small "+N"/"-N" under the total shows the
 // sum of that burst of presses; it stays until that player changes again.
 // The screen only refreshes when a total or a shown change actually changes.
 class LifePointsActivity final : public Activity {
