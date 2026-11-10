@@ -11,6 +11,9 @@
 // Short press = 1, hold >= 600 ms = 5 (applied once on release).
 // Hold a side key >= 1 s: reset both to 40. Short presses 1,4,1,4 within 3 s:
 // undo those four presses and return home.
+// 1 s after a player's last press, a small "+N"/"-N" under the total shows the
+// sum of that burst of presses; it stays until that player changes again.
+// The screen only refreshes when a total or a shown change actually changes.
 class LifePointsActivity final : public Activity {
  public:
   explicit LifePointsActivity(GfxRenderer& renderer, MappedInputManager& mappedInput)
@@ -23,7 +26,7 @@ class LifePointsActivity final : public Activity {
  private:
   static constexpr int FRONT_KEYS = 4;
 
-  void applyPress(int key, bool longPress);
+  void applyPress(int key, bool longPress, unsigned long now);
   void handleExitSequence(int key, bool longPress, unsigned long now);
   void markChanged(bool forceFull);
 
@@ -40,6 +43,12 @@ class LifePointsActivity final : public Activity {
   int seqLife1 = 0;
   int seqLife2 = 0;
 
-  int changesSinceFull = 0;
+  // Per player (0 = top, 1 = bottom): change summed since the burst started,
+  // the change currently drawn, and when the last press landed.
+  int pendingDelta[2] = {};
+  bool deltaPending[2] = {};
+  int shownDelta[2] = {};
+  unsigned long lastChange[2] = {};
+
   std::atomic<bool> fullRefreshPending{true};
 };

@@ -6,6 +6,8 @@
 #include <HalGPIO.h>
 
 #include <algorithm>
+#include <cstdio>
+#include <cstdlib>
 
 namespace {
 constexpr int START_LIFE = 40;
@@ -13,7 +15,7 @@ constexpr int MAX_LIFE = 999;
 constexpr unsigned long LONG_PRESS_MS = 600;
 constexpr unsigned long RESET_HOLD_MS = 1000;
 constexpr unsigned long EXIT_WINDOW_MS = 3000;
-constexpr int FULL_REFRESH_EVERY = 10;
+constexpr unsigned long DELTA_DELAY_MS = 1000;
 
 // Physical front keys, left to right.
 constexpr uint8_t FRONT_KEY[4] = {HalGPIO::BTN_BACK, HalGPIO::BTN_CONFIRM, HalGPIO::BTN_LEFT, HalGPIO::BTN_RIGHT};
@@ -48,30 +50,38 @@ struct RotatedText {
   }
 };
 
-void drawDigit(const RotatedText& t, int digit, int u0, int w, int h, int s) {
+// Draws one digit with its top edge at v0.
+void drawDigit(const RotatedText& t, int digit, int u0, int v0, int w, int h, int s) {
   const uint8_t m = SEGMENTS[digit];
   const int half = h / 2;
   if (digit == 1) {
-    t.fill(u0 + (w - s) / 2, 0, s, h);  // centered stroke reads better than b+c
+    t.fill(u0 + (w - s) / 2, v0, s, h);  // centered stroke reads better than b+c
     return;
   }
-  if (m & 0x01) t.fill(u0, 0, w, s);                       // a
-  if (m & 0x02) t.fill(u0 + w - s, 0, s, half + s / 2);    // b
-  if (m & 0x04) t.fill(u0 + w - s, half - s / 2, s, h - half + s / 2);  // c
-  if (m & 0x08) t.fill(u0, h - s, w, s);                   // d
-  if (m & 0x10) t.fill(u0, half - s / 2, s, h - half + s / 2);  // e
-  if (m & 0x20) t.fill(u0, 0, s, half + s / 2);            // f
-  if (m & 0x40) t.fill(u0, half - s / 2, w, s);            // g
+  if (m & 0x01) t.fill(u0, v0, w, s);                                    // a
+  if (m & 0x02) t.fill(u0 + w - s, v0, s, half + s / 2);                 // b
+  if (m & 0x04) t.fill(u0 + w - s, v0 + half - s / 2, s, h - half + s / 2);  // c
+  if (m & 0x08) t.fill(u0, v0 + h - s, w, s);                            // d
+  if (m & 0x10) t.fill(u0, v0 + half - s / 2, s, h - half + s / 2);      // e
+  if (m & 0x20) t.fill(u0, v0, s, half + s / 2);                         // f
+  if (m & 0x40) t.fill(u0, v0 + half - s / 2, w, s);                     // g
 }
 
-// Draws value centered in the screen rect (x,y,w,h), rotated.
-void drawLife(const GfxRenderer& renderer, int value, bool clockwise, int x, int y, int w, int h) {
+// Draws value centered in the screen rect (x,y,w,h), rotated, with the last
+// change ("-3", "+2") in small digits below it when delta is not 0.
+void drawLife(const GfxRenderer& renderer, int value, int delta, bool clockwise, int x, int y, int w, int h) {
   char text[4];
   const int n = snprintf(text, sizeof(text), "%d", value);
   constexpr int PAD = 28;
   // Screen height of the area is the text length, screen width its height.
   const int availLen = h - 2 * PAD;
-  const int availHeight = w - 2 * PAD;
+  // Room below the number is always reserved so it never moves.
+  constexpr int SMALL_H = 48;
+  constexpr int SMALL_W = 26;
+  constexpr int SMALL_STROKE = 6;
+  constexpr int SMALL_GAP = 8;
+  const int lineGap = 20;
+  const int availHeight = w - 2 * PAD - lineGap - SMALL_H;
   const int gap = availLen / 12;
   // Size for at least two digits so the number does not jump at 9 -> 10.
   const int slots = std::max(n, 2);
@@ -81,9 +91,25 @@ void drawLife(const GfxRenderer& renderer, int value, bool clockwise, int x, int
   const int stroke = std::max(6, digitW / 4);
   const int totalW = n * digitW + (n - 1) * gap;
 
-  const RotatedText t{renderer, clockwise, x + w / 2, y + h / 2, totalW, digitH};
+  const int blockH = digitH + lineGap + SMALL_H;
+
+  const RotatedText t{renderer, clockwise, x + w / 2, y + h / 2, totalW, blockH};
   for (int i = 0; i < n; ++i) {
-    drawDigit(t, text[i] - '0', i * (digitW + gap), digitW, digitH, stroke);
+    drawDigit(t, text[i] - '0', i * (digitW + gap), 0, digitW, digitH, stroke);
+  }
+  if (delta == 0) return;
+
+  char deltaText[5];
+  const int dn = snprintf(deltaText, sizeof(deltaText), "%d", std::abs(delta));
+  const int signW = SMALL_W;
+  const int deltaW = signW + dn * (SMALL_W + SMALL_GAP);
+  const int v0 = digitH + lineGap;
+  const RotatedText d{renderer, clockwise, x + w / 2, y + h / 2, deltaW, blockH};
+  d.fill(0, v0 + (SMALL_H - SMALL_STROKE) / 2, signW, SMALL_STROKE);  // minus bar
+  if (delta > 0) d.fill((signW - SMALL_STROKE) / 2, v0 + (SMALL_H - signW) / 2, SMALL_STROKE, signW);
+  for (int i = 0; i < dn; ++i) {
+    drawDigit(d, deltaText[i] - '0', signW + SMALL_GAP + i * (SMALL_W + SMALL_GAP), v0, SMALL_W, SMALL_H,
+              SMALL_STROKE);
   }
 }
 
@@ -108,7 +134,6 @@ void LifePointsActivity::onEnter() {
   for (int i = 0; i < FRONT_KEYS; ++i) pressActive[i] = false;
   sideActive = false;
   fullRefreshPending = true;
-  changesSinceFull = 0;
   requestUpdate();
 }
 
@@ -118,16 +143,16 @@ void LifePointsActivity::onExit() {
   Activity::onExit();
 }
 
+// Full refresh only on open and on reset; every other change is a fast refresh.
 void LifePointsActivity::markChanged(const bool forceFull) {
-  if (forceFull || ++changesSinceFull >= FULL_REFRESH_EVERY) {
-    changesSinceFull = 0;
-    fullRefreshPending = true;
-  }
+  if (forceFull) fullRefreshPending = true;
   requestUpdate();
 }
 
-void LifePointsActivity::applyPress(const int key, const bool longPress) {
+void LifePointsActivity::applyPress(const int key, const bool longPress, const unsigned long now) {
   const int amount = longPress ? 5 : 1;
+  const int before1 = life1;
+  const int before2 = life2;
   switch (key) {
     // Keys 1-2 sit under the bottom player (life2), keys 3-4 serve the top one.
     case 0:
@@ -145,6 +170,19 @@ void LifePointsActivity::applyPress(const int key, const bool longPress) {
     default:
       return;
   }
+  const int player = key <= 1 ? 1 : 0;
+  const int change = player == 0 ? life1 - before1 : life2 - before2;
+  if (change == 0) return;  // already at 0 or the maximum: nothing to redraw
+
+  // Presses less than DELTA_DELAY_MS apart add up to one shown change.
+  if (deltaPending[player]) {
+    pendingDelta[player] += change;
+  } else {
+    pendingDelta[player] = change;
+    deltaPending[player] = true;
+  }
+  shownDelta[player] = 0;  // hidden while the player is still pressing
+  lastChange[player] = now;
   markChanged(false);
 }
 
@@ -180,7 +218,23 @@ void LifePointsActivity::loop() {
     life1 = START_LIFE;
     life2 = START_LIFE;
     seqStep = 0;
+    for (int p = 0; p < 2; ++p) {
+      pendingDelta[p] = 0;
+      deltaPending[p] = false;
+      shownDelta[p] = 0;
+    }
     markChanged(true);
+  }
+
+  // Show a player's summed change once they stopped pressing for 1 s.
+  for (int p = 0; p < 2; ++p) {
+    if (deltaPending[p] && now - lastChange[p] >= DELTA_DELAY_MS) {
+      deltaPending[p] = false;
+      if (pendingDelta[p] != 0) {
+        shownDelta[p] = pendingDelta[p];
+        requestUpdate();  // fast refresh
+      }
+    }
   }
 
   for (int key = 0; key < FRONT_KEYS; ++key) {
@@ -193,7 +247,7 @@ void LifePointsActivity::loop() {
       const bool longPress = now - pressStart[key] >= LONG_PRESS_MS;
       // Apply first so every press gives feedback; the exit sequence undoes it.
       handleExitSequence(key, longPress, now);
-      applyPress(key, longPress);
+      applyPress(key, longPress, now);
       if (seqStep == 4) {
         life1 = seqLife1;
         life2 = seqLife2;
@@ -221,8 +275,8 @@ void LifePointsActivity::render(RenderLock&&) {
   const int innerX = MARGIN + LINE;
   const int innerW = width - 2 * innerX;
   const int areaH = mid - LINE / 2 - innerX - KEY_STRIP;
-  drawLife(renderer, life1, false, innerX, mid - LINE / 2 - areaH, innerW, areaH);
-  drawLife(renderer, life2, true, innerX, mid + LINE / 2, innerW, areaH);
+  drawLife(renderer, life1, shownDelta[0], false, innerX, mid - LINE / 2 - areaH, innerW, areaH);
+  drawLife(renderer, life2, shownDelta[1], true, innerX, mid + LINE / 2, innerW, areaH);
 
   // Circle centers match the theme's button-hint slots (BaseTheme::drawButtonHints).
   constexpr int narrowCenters[4] = {78, 183, 298, 403};
