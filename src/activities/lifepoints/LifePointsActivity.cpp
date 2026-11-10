@@ -6,8 +6,12 @@
 #include <HalGPIO.h>
 
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+
+#include "LifePointsArt.h"
 
 namespace {
 constexpr int START_LIFE = 40;
@@ -16,6 +20,7 @@ constexpr unsigned long LONG_PRESS_MS = 600;
 constexpr unsigned long RESET_HOLD_MS = 1000;
 constexpr unsigned long EXIT_WINDOW_MS = 3000;
 constexpr unsigned long DELTA_DELAY_MS = 2000;
+constexpr unsigned long TROPHY_DELAY_MS = 2000;
 
 // Physical front keys, left to right.
 constexpr uint8_t FRONT_KEY[4] = {HalGPIO::BTN_BACK, HalGPIO::BTN_CONFIRM, HalGPIO::BTN_LEFT, HalGPIO::BTN_RIGHT};
@@ -113,6 +118,83 @@ void drawLife(const GfxRenderer& renderer, int value, int delta, bool clockwise,
   }
 }
 
+// Caption under the game-over art: 7-row pixel font, CAPTION_PX per pixel.
+constexpr int CAPTION_PX = 5;
+constexpr int CAPTION_GAP = 20;
+
+const lifepoints_art::Glyph* findGlyph(const char ch) {
+  for (const auto& glyph : lifepoints_art::FONT) {
+    if (glyph.ch == ch) return &glyph;
+  }
+  return nullptr;
+}
+
+int captionWidth(const char* text) {
+  int width = 0;
+  for (const char* p = text; *p; ++p) {
+    const auto* glyph = findGlyph(*p);
+    if (!glyph) continue;
+    if (width > 0) width += CAPTION_PX;
+    width += static_cast<int>(strlen(glyph->rows[0])) * CAPTION_PX;
+  }
+  return width;
+}
+
+// Skull or trophy (with an optional ray burst) and a caption below it,
+// centered in the area (x,y,w,h) and rotated like the totals. Ray start and
+// end are fractions of the art's width; 0 means no rays.
+void drawGameOver(const GfxRenderer& renderer, const bool clockwise, const int x, const int y, const int w,
+                  const int h, const char* const* grid, const int rows, const int cols, const int cell,
+                  const float rayFrom, const float rayTo, const char* caption) {
+  const int gridW = cols * cell;
+  const int gridH = rows * cell;
+  const bool rays = rayTo > 0.0f;
+  const float rayStart = gridW * rayFrom;
+  const float rayEnd = gridW * rayTo;
+  const int side = rays ? static_cast<int>(2 * rayEnd) : gridW;
+  const int artH = std::max(side, gridH);
+  const int textW = captionWidth(caption);
+  const int boxW = std::max({side, gridW, textW});
+  const int boxH = artH + CAPTION_GAP + 7 * CAPTION_PX;
+  const RotatedText t{renderer, clockwise, x + w / 2, y + h / 2, boxW, boxH};
+
+  const int cu = boxW / 2;
+  const int cv = artH / 2;
+  const int u0 = cu - gridW / 2;
+  const int v0 = cv - gridH / 2;
+  for (int r = 0; r < rows; ++r) {
+    for (int c = 0; c < cols; ++c) {
+      if (grid[r][c] == '#') t.fill(u0 + c * cell, v0 + r * cell, cell, cell);
+    }
+  }
+
+  if (rays) {
+    // Eight dashed rays, one cell thick, every 45 degrees.
+    for (int k = 0; k < 8; ++k) {
+      const float a = k * static_cast<float>(M_PI) / 4.0f;
+      const float cs = cosf(a);
+      const float sn = sinf(a);
+      for (float rr = rayStart; rr <= rayEnd; rr += cell * 0.7f) {
+        t.fill(static_cast<int>(cu + cs * rr) - cell / 2, static_cast<int>(cv + sn * rr) - cell / 2, cell, cell);
+      }
+    }
+  }
+
+  int u = (boxW - textW) / 2;
+  const int textV = artH + CAPTION_GAP;
+  for (const char* p = caption; *p; ++p) {
+    const auto* glyph = findGlyph(*p);
+    if (!glyph) continue;
+    const int glyphW = static_cast<int>(strlen(glyph->rows[0]));
+    for (int r = 0; r < 7; ++r) {
+      for (int c = 0; c < glyphW; ++c) {
+        if (glyph->rows[r][c] == '#') t.fill(u + c * CAPTION_PX, textV + r * CAPTION_PX, CAPTION_PX, CAPTION_PX);
+      }
+    }
+    u += glyphW * CAPTION_PX + CAPTION_PX;
+  }
+}
+
 void drawKeyCircle(const GfxRenderer& renderer, int cx, int cy, bool plus) {
   constexpr int D = 46;
   constexpr int BAR = 22;
@@ -133,8 +215,24 @@ void LifePointsActivity::onEnter() {
   // Keys still held from the menu must be released before they count.
   for (int i = 0; i < FRONT_KEYS; ++i) pressActive[i] = false;
   sideActive = false;
+  // A game decided before leaving shows its trophy right away.
+  gameOver = (life1 == 0) != (life2 == 0);
+  trophyShown = gameOver;
   fullRefreshPending = true;
   requestUpdate();
+}
+
+// Exactly one player at 0 ends the game; the trophy follows TROPHY_DELAY_MS
+// later. Both at 0 shows two skulls and no trophy.
+void LifePointsActivity::updateGameOver(const unsigned long now) {
+  const bool over = (life1 == 0) != (life2 == 0);
+  if (over && !gameOver) {
+    gameOverSince = now;
+    trophyShown = false;
+  } else if (!over) {
+    trophyShown = false;
+  }
+  gameOver = over;
 }
 
 void LifePointsActivity::onExit() {
@@ -183,6 +281,7 @@ void LifePointsActivity::applyPress(const int key, const bool longPress, const u
   }
   shownDelta[player] = 0;  // hidden while the player is still pressing
   lastChange[player] = now;
+  updateGameOver(now);
   markChanged(false);
 }
 
@@ -223,6 +322,7 @@ void LifePointsActivity::loop() {
       deltaPending[p] = false;
       shownDelta[p] = 0;
     }
+    updateGameOver(now);
     markChanged(true);
   }
 
@@ -239,6 +339,11 @@ void LifePointsActivity::loop() {
         requestUpdate();  // fast refresh
       }
     }
+  }
+
+  if (gameOver && !trophyShown && now - gameOverSince >= TROPHY_DELAY_MS) {
+    trophyShown = true;
+    requestUpdate();  // fast refresh
   }
 
   for (int key = 0; key < FRONT_KEYS; ++key) {
@@ -279,8 +384,22 @@ void LifePointsActivity::render(RenderLock&&) {
   const int innerX = MARGIN + LINE;
   const int innerW = width - 2 * innerX;
   const int areaH = mid - LINE / 2 - innerX - KEY_STRIP;
-  drawLife(renderer, life1, shownDelta[0], false, innerX, mid - LINE / 2 - areaH, innerW, areaH);
-  drawLife(renderer, life2, shownDelta[1], true, innerX, mid + LINE / 2, innerW, areaH);
+  const int areaY[2] = {mid - LINE / 2 - areaH, mid + LINE / 2};
+  const int lives[2] = {life1, life2};
+  const bool anyDead = life1 == 0 || life2 == 0;
+  for (int p = 0; p < 2; ++p) {
+    const bool clockwise = p == 1;
+    if (lives[p] == 0) {
+      drawGameOver(renderer, clockwise, innerX, areaY[p], innerW, areaH, lifepoints_art::SKULL,
+                   lifepoints_art::SKULL_ROWS, lifepoints_art::SKULL_COLS, 9, 0.0f, 0.0f, "YOU LOSE");
+    } else if (anyDead && trophyShown) {
+      drawGameOver(renderer, clockwise, innerX, areaY[p], innerW, areaH, lifepoints_art::TROPHY,
+                   lifepoints_art::TROPHY_ROWS, lifepoints_art::TROPHY_COLS, 7, 0.66f, 0.8f, "YOU WIN");
+    } else {
+      // The change indicator stays hidden once someone is out.
+      drawLife(renderer, lives[p], anyDead ? 0 : shownDelta[p], clockwise, innerX, areaY[p], innerW, areaH);
+    }
+  }
 
   // Circle centers match the theme's button-hint slots (BaseTheme::drawButtonHints).
   constexpr int narrowCenters[4] = {78, 183, 298, 403};

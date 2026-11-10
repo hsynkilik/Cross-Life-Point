@@ -14,6 +14,8 @@
 // 2 s after a player's last press, a small "+N"/"-N" under the total shows the
 // sum of that burst of presses; it stays until that player changes again.
 // The screen only refreshes when a total or a shown change actually changes.
+// A player at 0 gets a skull ("YOU LOSE") at once; 2 s later the other player
+// gets a trophy with rays ("YOU WIN").
 class LifePointsActivity final : public Activity {
  public:
   explicit LifePointsActivity(GfxRenderer& renderer, MappedInputManager& mappedInput)
@@ -29,6 +31,7 @@ class LifePointsActivity final : public Activity {
   void applyPress(int key, bool longPress, unsigned long now);
   void handleExitSequence(int key, bool longPress, unsigned long now);
   void markChanged(bool forceFull);
+  void updateGameOver(unsigned long now);
 
   GfxRenderer::Orientation savedOrientation = GfxRenderer::Orientation::Portrait;
   unsigned long pressStart[FRONT_KEYS] = {};
@@ -49,6 +52,12 @@ class LifePointsActivity final : public Activity {
   bool deltaPending[2] = {};
   int shownDelta[2] = {};
   unsigned long lastChange[2] = {};
+
+  // Game over: exactly one player at 0, since when, and whether the
+  // winner's trophy is already drawn.
+  bool gameOver = false;
+  unsigned long gameOverSince = 0;
+  bool trophyShown = false;
 
   std::atomic<bool> fullRefreshPending{true};
 };
