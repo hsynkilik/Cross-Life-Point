@@ -9,7 +9,9 @@
 // other across the long sides: player 1 owns the top half, player 2 the bottom.
 // Front keys 1-4 (left to right): P2 -, P2 +, P1 +, P1 -.
 // Short press = 1, hold >= 600 ms = 5 (applied once on release).
-// Hold a side key >= 1 s: reset both to 40. Short presses 1,4,1,4 within 3 s:
+// Hold the top side key 1 s: show / hide each player's history (own changes,
+// newest 9). Hold the bottom side key 2 s: reset both to 40 and clear the
+// history. Sleep only after 20 min without input. Short presses 1,4,1,4 within 3 s:
 // undo those four presses and return home.
 // 2 s after a player's last press, a small "+N"/"-N" under the total shows the
 // sum of that burst of presses; it stays until that player changes again.
@@ -24,6 +26,7 @@ class LifePointsActivity final : public Activity {
   void onExit() override;
   void loop() override;
   void render(RenderLock&&) override;
+  bool preventAutoSleep() override;
 
  private:
   static constexpr int FRONT_KEYS = 4;
@@ -36,9 +39,12 @@ class LifePointsActivity final : public Activity {
   GfxRenderer::Orientation savedOrientation = GfxRenderer::Orientation::Portrait;
   unsigned long pressStart[FRONT_KEYS] = {};
   bool pressActive[FRONT_KEYS] = {};
-  unsigned long sideStart = 0;
-  bool sideActive = false;
-  bool sideResetDone = false;
+  // Side keys: 0 = top (history), 1 = bottom (reset).
+  unsigned long sideStart[2] = {};
+  bool sideActive[2] = {};
+  bool sideDone[2] = {};
+  bool showHistory = false;
+  unsigned long lastInput = 0;  // last key press or release, for the sleep delay
 
   // Exit sequence 1,4,1,4: step count, start time, and life totals before it.
   int seqStep = 0;
