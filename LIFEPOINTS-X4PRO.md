@@ -1,4 +1,4 @@
-# LifePoints for the Xteink X4 Pro (touch)
+# Cross-Life-Point (Crosspoint 2.0 + Lifepoint Counter) for the Xteink X4 Pro (touch)
 
 > **Untested build.** This version was built and checked (valid ESP32-S3 image), but it has
 > **not been tried on a real X4 Pro yet**. Make a backup before flashing (see below).
