@@ -28,7 +28,7 @@
   "description": "Two-player life counter for Flesh and Blood TCG on the Xteink X4 and X4 Pro e-ink reader, built into the open-source CrossPoint 2.0 firmware.",
   "url": "https://hsynkilik.github.io/Cross-Life-Point/",
   "downloadUrl": "https://github.com/hsynkilik/Cross-Life-Point/releases",
-  "softwareVersion": "1.0",
+  "softwareVersion": "1.1",
   "license": "https://opensource.org/licenses/MIT",
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}
 }
@@ -104,6 +104,8 @@ Cross-Life-Point is the open-source <a href="https://github.com/crosspoint-reade
 <li><strong>Change indicator:</strong> 2 seconds after your last press, a small "−7" or "+2" under your total shows how much it changed. Quick presses are added up.</li>
 <li><strong>Game over:</strong> a skull with crossed bones and "YOU LOSE" at 0, then a trophy with rays and "YOU WIN" for the winner. Pressing + undoes a mistaken 0.</li>
 <li><strong>E-ink friendly:</strong> a full refresh only when opening and on reset, fast refresh otherwise, nothing redraws if nothing changed.</li>
+<li><strong>History per player:</strong> hold the top side button to see every change on your own half, from "Start 40" down to the newest change in bold. The newest 9 stay when the list gets long.</li>
+<li><strong>Stays awake for 20 minutes</strong> without input while LifePoints is open.</li>
 <li><strong>Keeps your game</strong> during a quick trip to the home menu.</li>
 </ul>
 
@@ -124,9 +126,11 @@ Cross-Life-Point is the open-source <a href="https://github.com/crosspoint-reade
 <tr><td>3</td><td>top player +1</td></tr>
 <tr><td>4</td><td>top player −1</td></tr>
 <tr><td>Hold any of them 0.6 s</td><td>±5 instead of ±1</td></tr>
-<tr><td>Hold a side button 1 s</td><td>reset both to 40</td></tr>
+<tr><td>Hold the top side button 1 s</td><td>show / hide the history</td></tr>
+<tr><td>Hold the bottom side button 2 s</td><td>reset both to 40 and clear the history</td></tr>
 <tr><td>Press 1, 4, 1, 4 within 3 s</td><td>back to the home menu</td></tr>
 </table>
+<figure style="max-width:520px;margin:6px 0 18px"><img src="img/x4-history.png" width="800" height="480" alt="Cross-Life-Point history screen: Start 40, then -4 to 36 and -5 to 31"><figcaption>History on the X4 (layout illustration): each player sees only their own changes.</figcaption></figure>
 <h3>Xteink X4 Pro (touch) – untested build</h3>
 <figure style="max-width:420px"><img src="img/x4pro-game.png" width="800" height="480" alt="Cross-Life-Point on the Xteink X4 Pro with framed touch fields for minus and plus"><figcaption>Framed − and + fields at both ends. Only these four fields react to touch.</figcaption></figure>
 <table>
@@ -150,6 +154,7 @@ esptool --chip esp32c3 write-flash 0x10000 custom.bin</pre>
 <details><summary>Can I use it for Magic: The Gathering?</summary><p>Yes. Both players start at 40, which matches Commander. It works for any two-player game that tracks life totals.</p></details>
 <details><summary>Do I lose my e-reader?</summary><p>No. Cross-Life-Point is the normal CrossPoint 2.0 firmware with one extra menu entry. Books, library and settings stay as they are.</p></details>
 <details><summary>Does it work on the Xteink X4 Pro?</summary><p>There is a touch version for the X4 Pro. It is built and checked, but not yet tested on a real device. Feedback is welcome on GitHub.</p></details>
+<details><summary>Can I see who lost how much?</summary><p>Yes. Hold the top side button for 1 second. Each half shows that player's own history: every change and the new total, newest at the bottom. Resetting clears it.</p></details>
 <details><summary>Why not press two buttons at once to reset?</summary><p>On the X4 all four front buttons share one analog input, so two buttons pressed together read as one wrong button. Holding a side button is reliable.</p></details>
 <details><summary>Is this an official CrossPoint project?</summary><p>No. It's an unofficial fork, not supported by the CrossPoint team. All credit for the reader firmware goes to the CrossPoint contributors.</p></details>
 
