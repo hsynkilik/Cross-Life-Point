@@ -6,7 +6,7 @@
 > ([LIFEPOINTS.md](./LIFEPOINTS.md)).
 
 The X4 Pro has a touchscreen, a capacitive Home key, two small nav buttons and no front
-buttons. This branch (`x4pro`) adds touch controls to LifePoints. Everything else in
+buttons. This branch (`lifepoints-x4pro`) adds touch controls to LifePoints. Everything else in
 CrossPoint stays unchanged, and on a device without touch the code behaves exactly like
 the X4 version.
 
