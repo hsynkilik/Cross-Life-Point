@@ -1,6 +1,6 @@
 # CrossPoint Reader
 
-> **This fork:** CrossPoint 2.0.0 with one extra menu entry, **LifePoints**, a two-player
+> **Cross-Life-Point (Crosspoint 2.0 + Lifepoint Counter)**: this fork is CrossPoint 2.0.0 with one extra menu entry, **LifePoints**, a two-player
 > life counter (Flesh and Blood) for the Xteink X4.
 > Guide, controls and install: **[LIFEPOINTS.md](./LIFEPOINTS.md)** ·
 > Ready-made firmware: **[Releases](../../releases)**.

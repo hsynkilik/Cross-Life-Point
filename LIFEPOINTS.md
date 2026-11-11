@@ -1,4 +1,4 @@
-# CrossPoint + LifePoints
+# Cross-Life-Point (Crosspoint 2.0 + Lifepoint Counter)
 
 This fork is the official [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader) 2.0.0
 with **one extra menu entry: LifePoints**, a two-player life counter
