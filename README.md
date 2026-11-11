@@ -17,7 +17,7 @@ full e-reader.
 - **Xteink X4:** front buttons, tested on a real device:
   [guide](https://github.com/hsynkilik/Cross-Life-Point/blob/lifepoints/LIFEPOINTS.md)
 - **Xteink X4 Pro:** touch fields, untested build:
-  [guide](https://github.com/hsynkilik/Cross-Life-Point/blob/x4pro/LIFEPOINTS-X4PRO.md)
+  [guide](https://github.com/hsynkilik/Cross-Life-Point/blob/lifepoints-x4pro/LIFEPOINTS-X4PRO.md)
 - Ready-to-flash firmware: **[Releases](https://github.com/hsynkilik/Cross-Life-Point/releases)**
 
 *Also known as: e-ink life counter, e-paper life tracker, FaB life counter, TCG life counter
