@@ -22,6 +22,11 @@ constexpr unsigned long EXIT_WINDOW_MS = 3000;
 constexpr unsigned long DELTA_DELAY_MS = 2000;
 constexpr unsigned long TROPHY_DELAY_MS = 2000;
 
+// Screen layout (portrait): outer frame, divider, and the +/- band at each end.
+constexpr int MARGIN = 6;
+constexpr int LINE = 4;
+constexpr int KEY_STRIP = 72;
+
 // Physical front keys, left to right.
 constexpr uint8_t FRONT_KEY[4] = {HalGPIO::BTN_BACK, HalGPIO::BTN_CONFIRM, HalGPIO::BTN_LEFT, HalGPIO::BTN_RIGHT};
 // Exit sequence: keys 1,4,1,4 (0-based 0,3,0,3).
@@ -200,6 +205,13 @@ void drawKeyCircle(const GfxRenderer& renderer, int cx, int cy, bool plus) {
   constexpr int BAR = 22;
   constexpr int THICK = 4;
   renderer.drawRoundedRect(cx - D / 2, cy - D / 2, D, D, 3, D / 2, true);
+  if (gpio.hasTouch()) {
+    // Touch layout: players read the screen sideways, so the minus bar runs
+    // top to bottom.
+    renderer.fillRect(cx - THICK / 2, cy - BAR / 2, THICK, BAR);
+    if (plus) renderer.fillRect(cx - BAR / 2, cy - THICK / 2, BAR, THICK);
+    return;
+  }
   renderer.fillRect(cx - BAR / 2, cy - THICK / 2, BAR, THICK);
   if (plus) renderer.fillRect(cx - THICK / 2, cy - BAR / 2, THICK, BAR);
 }
@@ -214,6 +226,7 @@ void LifePointsActivity::onEnter() {
   }
   // Keys still held from the menu must be released before they count.
   for (int i = 0; i < FRONT_KEYS; ++i) pressActive[i] = false;
+  touchZone = -1;
   sideActive = false;
   // A game decided before leaving shows its trophy right away.
   gameOver = (life1 == 0) != (life2 == 0);
@@ -245,6 +258,19 @@ void LifePointsActivity::onExit() {
 void LifePointsActivity::markChanged(const bool forceFull) {
   if (forceFull) fullRefreshPending = true;
   requestUpdate();
+}
+
+// Touch boards: the +/- band at each end, split in halves. Returns the same
+// key index as the X4 front keys (0 bottom -, 1 bottom +, 2 top +, 3 top -),
+// or -1 outside the bands. Each player has - on their own left.
+int LifePointsActivity::touchZoneAt(const int x, const int y) const {
+  const int width = renderer.getScreenWidth();
+  const int height = renderer.getScreenHeight();
+  const int band = MARGIN + LINE + KEY_STRIP;
+  const bool leftHalf = x < width / 2;
+  if (y >= height - band) return leftHalf ? 0 : 1;
+  if (y < band) return leftHalf ? 2 : 3;
+  return -1;
 }
 
 void LifePointsActivity::applyPress(const int key, const bool longPress, const unsigned long now) {
@@ -303,8 +329,12 @@ void LifePointsActivity::handleExitSequence(const int key, const bool longPress,
 void LifePointsActivity::loop() {
   const unsigned long now = millis();
 
-  // Side keys sit on a separate ADC pin, so holding one is unambiguous.
-  const bool sideDown = gpio.isPressed(HalGPIO::BTN_UP) || gpio.isPressed(HalGPIO::BTN_DOWN);
+  const bool touch = gpio.hasTouch();
+
+  // Reset key: X4 side keys (separate ADC pin, so holding one is unambiguous);
+  // on touch boards such as the X4 Pro also its Left/Right nav buttons.
+  const bool sideDown = gpio.isPressed(HalGPIO::BTN_UP) || gpio.isPressed(HalGPIO::BTN_DOWN) ||
+                        (touch && (gpio.isPressed(HalGPIO::BTN_LEFT) || gpio.isPressed(HalGPIO::BTN_RIGHT)));
   if (sideDown && !sideActive) {
     sideActive = true;
     sideResetDone = false;
@@ -346,6 +376,32 @@ void LifePointsActivity::loop() {
     requestUpdate();  // fast refresh
   }
 
+  if (touch) {
+    // Touch zones reuse the key bookkeeping: hold time, change summing, and the
+    // pause of the change indicator while a finger is down. Home leaves via
+    // the ActivityManager's Home key handling.
+    // Only the four +/- fields react, and a press counts only when the finger
+    // lifts inside the field it started in: sliding out cancels it.
+    int x = 0;
+    int y = 0;
+    if (mappedInput.wasScreenTouchPressed(x, y)) {
+      touchZone = touchZoneAt(x, y);
+      touchInZone = touchZone >= 0;
+      if (touchZone >= 0) {
+        pressActive[touchZone] = true;
+        pressStart[touchZone] = now;
+      }
+    }
+    if (touchZone >= 0 && mappedInput.isScreenTouchHeld(x, y)) touchInZone = touchZoneAt(x, y) == touchZone;
+    if (touchZone >= 0 && mappedInput.wasScreenTouchReleased()) {
+      const int zone = touchZone;
+      touchZone = -1;
+      pressActive[zone] = false;
+      if (touchInZone) applyPress(zone, now - pressStart[zone] >= LONG_PRESS_MS, now);
+    }
+    return;
+  }
+
   for (int key = 0; key < FRONT_KEYS; ++key) {
     if (gpio.wasPressed(FRONT_KEY[key])) {
       pressActive[key] = true;
@@ -370,10 +426,6 @@ void LifePointsActivity::loop() {
 void LifePointsActivity::render(RenderLock&&) {
   const int width = renderer.getScreenWidth();
   const int height = renderer.getScreenHeight();
-  constexpr int MARGIN = 6;
-  constexpr int LINE = 4;
-  constexpr int KEY_STRIP = 72;  // bottom band for the +/- circles
-
   renderer.clearScreen();
   renderer.drawRect(MARGIN, MARGIN, width - 2 * MARGIN, height - 2 * MARGIN, LINE, true);
   const int mid = height / 2;
@@ -401,13 +453,33 @@ void LifePointsActivity::render(RenderLock&&) {
     }
   }
 
-  // Circle centers match the theme's button-hint slots (BaseTheme::drawButtonHints).
-  constexpr int narrowCenters[4] = {78, 183, 298, 403};
-  constexpr int wideCenters[4] = {91, 207, 321, 437};
-  const int* centers = width >= 528 ? wideCenters : narrowCenters;
-  const int circleY = height - MARGIN - LINE - KEY_STRIP / 2;
-  constexpr bool PLUS[4] = {false, true, true, false};
-  for (int i = 0; i < 4; ++i) drawKeyCircle(renderer, centers[i], circleY, PLUS[i]);
+  const int bottomCircleY = height - MARGIN - LINE - KEY_STRIP / 2;
+  if (gpio.hasTouch()) {
+    // A frame around each band, split in the middle: the outlines are exactly
+    // the touch zones (see touchZoneAt).
+    constexpr int INSET = 6;
+    constexpr int BOX_LINE = 3;
+    const int boxX = MARGIN + LINE + INSET;
+    const int boxW = width - 2 * boxX;
+    const int boxH = KEY_STRIP - 2 * INSET;
+    for (const int boxY : {MARGIN + LINE + INSET, height - MARGIN - LINE - KEY_STRIP + INSET}) {
+      renderer.drawRect(boxX, boxY, boxW, boxH, BOX_LINE, true);
+      renderer.fillRect(width / 2 - BOX_LINE / 2, boxY, BOX_LINE, boxH);
+    }
+    // One circle per touch zone: - on each player's left.
+    const int topCircleY = MARGIN + LINE + KEY_STRIP / 2;
+    drawKeyCircle(renderer, width / 4, topCircleY, true);
+    drawKeyCircle(renderer, width * 3 / 4, topCircleY, false);
+    drawKeyCircle(renderer, width / 4, bottomCircleY, false);
+    drawKeyCircle(renderer, width * 3 / 4, bottomCircleY, true);
+  } else {
+    // Circle centers match the theme's button-hint slots (BaseTheme::drawButtonHints).
+    constexpr int narrowCenters[4] = {78, 183, 298, 403};
+    constexpr int wideCenters[4] = {91, 207, 321, 437};
+    const int* centers = width >= 528 ? wideCenters : narrowCenters;
+    constexpr bool PLUS[4] = {false, true, true, false};
+    for (int i = 0; i < 4; ++i) drawKeyCircle(renderer, centers[i], bottomCircleY, PLUS[i]);
+  }
 
   renderer.displayBuffer(fullRefreshPending.exchange(false) ? HalDisplay::FULL_REFRESH : HalDisplay::FAST_REFRESH);
 }

@@ -16,6 +16,9 @@
 // The screen only refreshes when a total or a shown change actually changes.
 // A player at 0 gets a skull ("YOU LOSE") at once; 2 s later the other player
 // gets a trophy with rays ("YOU WIN").
+// Touch boards (X4 Pro): tap the +/- band at either end instead of the front
+// keys (- on each player's left, + on their right; hold = 5), hold a Left/Right
+// nav button 1 s to reset, and press Home to leave.
 class LifePointsActivity final : public Activity {
  public:
   explicit LifePointsActivity(GfxRenderer& renderer, MappedInputManager& mappedInput)
@@ -32,6 +35,7 @@ class LifePointsActivity final : public Activity {
   void handleExitSequence(int key, bool longPress, unsigned long now);
   void markChanged(bool forceFull);
   void updateGameOver(unsigned long now);
+  int touchZoneAt(int x, int y) const;
 
   GfxRenderer::Orientation savedOrientation = GfxRenderer::Orientation::Portrait;
   unsigned long pressStart[FRONT_KEYS] = {};
@@ -39,6 +43,8 @@ class LifePointsActivity final : public Activity {
   unsigned long sideStart = 0;
   bool sideActive = false;
   bool sideResetDone = false;
+  int touchZone = -1;        // zone the touch started in on touch boards, -1 if none
+  bool touchInZone = false;  // finger still inside that zone
 
   // Exit sequence 1,4,1,4: step count, start time, and life totals before it.
   int seqStep = 0;

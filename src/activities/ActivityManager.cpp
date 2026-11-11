@@ -138,8 +138,10 @@ void ActivityManager::loop() {
       // The header back button shares this band; its taps stay Back.
       statusBarTap = mappedInput.wasScreenTapped(tx, ty) && ty < 44 && !HeaderBackTapTarget::contains(tx, ty);
     }
+    // LifePoints keeps the whole screen for its +/- fields, so the top-edge
+    // swipe must not open the control center there.
     if (mappedInput.hasTouch() && currentActivity->name != "FrontlightPanel" &&
-        (statusBarTap || mappedInput.wasLightPanelGesture())) {
+        currentActivity->name != "LifePoints" && (statusBarTap || mappedInput.wasLightPanelGesture())) {
       haptic_feedback::touchAction();
       pushActivity(std::make_unique<FrontlightPanelActivity>(renderer, mappedInput));
       return;
