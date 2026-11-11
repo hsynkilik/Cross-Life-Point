@@ -60,6 +60,7 @@ the case still has to be confirmed on a real X4 Pro.
 | Game in progress (bottom player just lost 6) | <img src="docs/lifepoints/x4pro/screen_game.png" width="160"> | <img src="docs/lifepoints/x4pro/view_game_bottom_player.png" width="300"> |
 | Top player reaches 0 | <img src="docs/lifepoints/x4pro/screen_skull.png" width="160"> | <img src="docs/lifepoints/x4pro/view_loser.png" width="300"> (loser) |
 | 2 seconds later | <img src="docs/lifepoints/x4pro/screen_trophy.png" width="160"> | <img src="docs/lifepoints/x4pro/view_winner.png" width="300"> (winner) |
+| History (hold Right 1 s) | | <img src="docs/lifepoints/x4pro/view_history.png" width="300"> (bottom player lost 4, then 5) |
 
 The minus signs in the circles run along the short side of the screen, so they read as a
 minus for players looking at the device from the side.
