@@ -1,10 +1,32 @@
-# CrossPoint Reader
+# Cross-Life-Point (Crosspoint 2.0 + Lifepoint Counter)
 
-> **Cross-Life-Point (Crosspoint 2.0 + Lifepoint Counter)**: this fork is CrossPoint 2.0.0 with one extra menu entry, **LifePoints**, a two-player
-> life counter (Flesh and Blood) for the Xteink X4.
-> Guide, controls and install: **[LIFEPOINTS.md](./LIFEPOINTS.md)** ·
-> Ready-made firmware: **[Releases](../../releases)**.
-> Everything below is the unchanged description of the official project.
+**A Flesh and Blood life counter for the Xteink X4 and X4 Pro e-ink reader.**
+Cross-Life-Point is the open-source [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader)
+2.0 firmware with one extra menu entry, **LifePoints**: a two-player life tracker on the e-paper
+screen. No phone on the table, no glowing screen, weeks of battery, and your e-reader stays a
+full e-reader.
+
+<p>
+  <img src="https://raw.githubusercontent.com/hsynkilik/Cross-Life-Point/lifepoints/docs/lifepoints/view_game_bottom_player.png" width="400" alt="Cross-Life-Point e-ink life counter on the Xteink X4: game in progress, 40 vs 34">
+  <img src="https://raw.githubusercontent.com/hsynkilik/Cross-Life-Point/lifepoints/docs/lifepoints/view_winner.png" width="400" alt="Cross-Life-Point life tracker game over screen: trophy for the winner, skull for the loser">
+</p>
+
+- Two players, both start at **40 life** (Flesh and Blood Classic Constructed; also fits
+  Magic: The Gathering Commander and any other card game that tracks life)
+- Huge rotated totals, a "−7 / +2" change indicator, skull and trophy when the game ends
+- **Xteink X4:** front buttons, tested on a real device:
+  [guide](https://github.com/hsynkilik/Cross-Life-Point/blob/lifepoints/LIFEPOINTS.md)
+- **Xteink X4 Pro:** touch fields, untested build:
+  [guide](https://github.com/hsynkilik/Cross-Life-Point/blob/x4pro/LIFEPOINTS-X4PRO.md)
+- Ready-to-flash firmware: **[Releases](https://github.com/hsynkilik/Cross-Life-Point/releases)**
+
+*Also known as: e-ink life counter, e-paper life tracker, FaB life counter, TCG life counter
+without a phone, Xteink life counter, CrossPoint life counter.*
+
+> Unofficial fork, not supported by the CrossPoint team. Everything below is the unchanged
+> description of the official CrossPoint project.
+
+# CrossPoint Reader
 
 [![Fund contributors](https://img.shields.io/badge/%F0%9F%91%91_Fund_contributors-royalty.dev-BB953A?style=for-the-badge&labelColor=1a1a1a)](https://app.royalty.dev/crosspoint-reader/crosspoint-reader)
 
