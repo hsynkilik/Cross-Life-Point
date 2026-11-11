@@ -52,6 +52,8 @@ In the **Cover Grid theme** it is the heart in the bottom bar.
 
 Buttons 1–4 = the four front buttons **from left to right**.
 
+<img src="docs/lifepoints/controls_x4.png" width="560" alt="Xteink X4 controls: front buttons 1 to 4, top side button for the history, bottom side button for reset">
+
 | Button | Circle | Action |
 |---|---|---|
 | 1 | − | bottom player −1 |
@@ -98,6 +100,10 @@ History, as the bottom player sees it after losing 4 and then 5 (illustration of
 on the device it uses the CrossPoint UI font):
 
 <img src="docs/lifepoints/view_history.png" width="500" alt="LifePoints history: Start 40, 1. -4 to 36, 2. -5 to 31">
+
+A long game, as the top player sees it: with 12 changes only the newest 9 (4. to 12.) stay.
+
+<img src="docs/lifepoints/view_history_long.png" width="500" alt="LifePoints history with 12 changes: entries 4 to 12 shown, newest in bold">
 
 Home menu icons, enlarged; only the heart (right) is new:
 
