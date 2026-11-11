@@ -29,7 +29,9 @@ seat, **−** is on the left and **+** is on the right.
 | −1 / +1 | Tap a − or + field |
 | −5 / +5 | Hold a field for 0.6 seconds or longer, then lift |
 | Cancel a press | Slide the finger out of the field before lifting |
-| Reset to 40/40 | Hold the Left or Right nav button for 1 second |
+| Show / hide the history | Hold the **Right** nav button for 1 second |
+| Close the history | Tap any − or + field (no total changes) |
+| Reset to 40/40 | Hold the **Left** nav button for 2 seconds (also clears the history) |
 | Back to the home menu | Press the Home key |
 
 **Touch is locked to the four fields.** Taps anywhere else (on the numbers, the divider)
@@ -43,6 +45,13 @@ Everything else works like the X4 version:
 - A player at 0 gets a skull with crossed bones and "YOU LOSE"; 2 seconds later the other
   player gets a trophy with rays and "YOU WIN".
 - Full refresh only when opening LifePoints and on reset; fast refresh otherwise.
+- **History per player:** each half shows that player's own changes, "Start 40" at the top,
+  the newest in bold at the bottom; with more than 9 changes the newest 9 stay.
+- **Stays awake:** the device sleeps only after 20 minutes without input while LifePoints is
+  open (a longer sleep setting is kept).
+
+"Right" and "Left" are CrossPoint's names for the two nav buttons; which one sits where on
+the case still has to be confirmed on a real X4 Pro.
 
 ## Screens
 

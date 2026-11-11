@@ -35,6 +35,12 @@ This is an unofficial fork. It is not supported by the CrossPoint team.
   "YOU LOSE" right away. 2 seconds later the other player gets a **trophy with rays** and
   "YOU WIN". If the 0 was a mistake, pressing + brings the numbers back. If both players
   reach 0, both get a skull.
+- **History:** hold the top side button for 1 second to see each player's own changes on their
+  half: "Start 40", then every change with the new total (for example "2.  −5  → 31"), the newest
+  in bold at the bottom. With more than 9 changes only the newest 9 stay. A change is recorded
+  when the change indicator appears, so quick presses count as one entry.
+- **Stays awake:** while LifePoints is open, the device only goes to sleep after 20 minutes
+  without a button press. A longer sleep setting (or "never") is kept.
 - The game state survives a quick trip to the home menu
   (but not sleep or a restart).
 
@@ -55,7 +61,9 @@ Buttons 1–4 = the four front buttons **from left to right**.
 
 - **Short press** = 1 point.
 - **Hold (0.6 seconds or longer)** = 5 points, applied once on release.
-- **Reset to 40/40:** **hold a side button for 1 second**.
+- **History:** **hold the top side button for 1 second** to open or close it. Any front button
+  also closes it without changing a total.
+- **Reset to 40/40:** **hold the bottom side button for 2 seconds**. This also clears the history.
 - **Back to the home menu:** press **1, 4, 1, 4** quickly (within 3 seconds).
   Any life changes made by these presses are undone automatically.
 
@@ -64,7 +72,8 @@ Buttons 1–4 = the four front buttons **from left to right**.
 | Situation | Refresh |
 |---|---|
 | Opening LifePoints | full (one strong flash) |
-| Reset with the side button | full |
+| Reset with the bottom side button | full |
+| History opens or closes | fast |
 | Life total changes | fast |
 | Change indicator appears | fast |
 | Skull / trophy appears | fast |
@@ -85,11 +94,16 @@ The full-screen images show the device in portrait with the buttons at the botto
 | Top player reaches 0 | <img src="docs/lifepoints/screen_skull.png" width="160"> | <img src="docs/lifepoints/view_loser.png" width="300"> (loser) |
 | 2 seconds later | <img src="docs/lifepoints/screen_trophy.png" width="160"> | <img src="docs/lifepoints/view_winner.png" width="300"> (winner) |
 
+History, as the bottom player sees it after losing 4 and then 5 (illustration of the layout;
+on the device it uses the CrossPoint UI font):
+
+<img src="docs/lifepoints/view_history.png" width="500" alt="LifePoints history: Start 40, 1. -4 to 36, 2. -5 to 31">
+
 Home menu icons, enlarged; only the heart (right) is new:
 
 <img src="docs/lifepoints/menu_icons_heart.png" width="600" alt="Folder, library, transfer, settings and the new heart icon">
 
-### Why reset with the side button?
+### Why the side buttons for reset and history?
 
 The original plan was "press buttons 2 and 3 together". On the X4, however, all four front buttons
 share **a single analog input** (a resistor ladder on one ADC pin). Two buttons pressed at once

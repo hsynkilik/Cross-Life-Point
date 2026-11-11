@@ -14,6 +14,8 @@ full e-reader.
 - Two players, both start at **40 life** (Flesh and Blood Classic Constructed; also fits
   Magic: The Gathering Commander and any other card game that tracks life)
 - Huge rotated totals, a "−7 / +2" change indicator, skull and trophy when the game ends
+- Per-player history of every change (X4: hold the top side button; X4 Pro: hold Right),
+  stays awake for 20 minutes
 - **Xteink X4:** front buttons, tested on a real device:
   [guide](https://github.com/hsynkilik/Cross-Life-Point/blob/lifepoints/LIFEPOINTS.md)
 - **Xteink X4 Pro:** touch fields, untested build:
