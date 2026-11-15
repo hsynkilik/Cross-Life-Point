@@ -266,8 +266,9 @@ void drawKeyCircle(const GfxRenderer& renderer, int cx, int cy, bool plus) {
   constexpr int BAR = 22;
   constexpr int THICK = 4;
   renderer.drawRoundedRect(cx - D / 2, cy - D / 2, D, D, 3, D / 2, true);
-  renderer.fillRect(cx - BAR / 2, cy - THICK / 2, BAR, THICK);
-  if (plus) renderer.fillRect(cx - THICK / 2, cy - BAR / 2, THICK, BAR);
+  // Players read the screen sideways, so the minus bar runs top to bottom.
+  renderer.fillRect(cx - THICK / 2, cy - BAR / 2, THICK, BAR);
+  if (plus) renderer.fillRect(cx - BAR / 2, cy - THICK / 2, BAR, THICK);
 }
 }  // namespace
 
