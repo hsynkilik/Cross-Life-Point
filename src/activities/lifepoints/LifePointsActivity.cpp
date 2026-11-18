@@ -24,7 +24,7 @@ constexpr unsigned long RESET_HOLD_MS = 2000;    // bottom side key
 constexpr unsigned long IDLE_SLEEP_MS = 20UL * 60UL * 1000UL;
 constexpr unsigned long EXIT_WINDOW_MS = 3000;
 constexpr unsigned long DELTA_DELAY_MS = 2000;
-constexpr unsigned long TROPHY_DELAY_MS = 2000;
+constexpr unsigned long TROPHY_DELAY_MS = 500;
 
 // Physical front keys, left to right.
 constexpr uint8_t FRONT_KEY[4] = {HalGPIO::BTN_BACK, HalGPIO::BTN_CONFIRM, HalGPIO::BTN_LEFT, HalGPIO::BTN_RIGHT};
@@ -350,14 +350,15 @@ void LifePointsActivity::applyPress(const int key, const bool longPress, const u
   const int change = player == 0 ? life1 - before1 : life2 - before2;
   if (change == 0) return;  // already at 0 or the maximum: nothing to redraw
 
-  // Presses less than DELTA_DELAY_MS apart add up to one shown change.
+  // Presses less than DELTA_DELAY_MS apart add up to one change. The running
+  // sum is shown right away and stays until the player's next round of presses.
   if (deltaPending[player]) {
     pendingDelta[player] += change;
   } else {
     pendingDelta[player] = change;
     deltaPending[player] = true;
   }
-  shownDelta[player] = 0;  // hidden while the player is still pressing
+  shownDelta[player] = pendingDelta[player];
   lastChange[player] = now;
   updateGameOver(now);
   markChanged(false);
@@ -416,18 +417,17 @@ void LifePointsActivity::loop() {
     markChanged(true);
   }
 
-  // Show a player's summed change once they stopped pressing for 2 s. The
-  // wait restarts on release and is paused while one of their keys is down,
-  // so a hold (5) followed by short presses still adds up to one change.
+  // Close a player's round of presses once they stopped for 2 s and log it in
+  // the history. The wait restarts on release and is paused while one of their
+  // keys is down, so a hold (5) followed by short presses adds up to one change.
+  // The running sum is already on screen, so no redraw is needed here.
   for (int p = 0; p < 2; ++p) {
     const bool keyDown = p == 1 ? (pressActive[0] || pressActive[1]) : (pressActive[2] || pressActive[3]);
     if (keyDown) continue;
     if (deltaPending[p] && now - lastChange[p] >= DELTA_DELAY_MS) {
       deltaPending[p] = false;
       if (pendingDelta[p] != 0) {
-        shownDelta[p] = pendingDelta[p];
         addHistory(p, pendingDelta[p], p == 0 ? life1 : life2);
-        requestUpdate();  // fast refresh
       }
     }
   }

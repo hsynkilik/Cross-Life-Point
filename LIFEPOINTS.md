@@ -28,17 +28,19 @@ This is an unofficial fork. It is not supported by the CrossPoint team.
 - Huge black numbers, **rotated sideways** so each player can read their own total
   (top: 90° counter-clockwise, bottom: 90° clockwise).
 - Small circles with **− + + −** right above the buttons, no other text.
-- **Change indicator:** 2 seconds after the last button press, a small number under the total
-  shows how much it changed in total (for example **−7** or **+2**). Presses in quick
-  succession are added up. The indicator stays until that player changes their total again.
+- **Change indicator:** a small number under the total counts along while you press
+  (−1, −2, … −7). Presses less than 2 seconds apart add up. After the last press the number
+  stays until that player's next round of presses, which starts a new count.
+
+  <img src="docs/lifepoints/view_counting.png" width="650" alt="The small number counts along: -1, then -2, then -7 after a hold">
 - **Game over:** when a player reaches 0, their half shows a **skull with crossed bones** and
-  "YOU LOSE" right away. 2 seconds later the other player gets a **trophy with rays** and
+  "YOU LOSE" right away. Half a second later the other player gets a **trophy with rays** and
   "YOU WIN". If the 0 was a mistake, pressing + brings the numbers back. If both players
   reach 0, both get a skull.
 - **History:** hold the top side button for 1 second to see each player's own changes on their
   half: "Start 40", then every change with the new total (for example "2.  −5  → 31"), the newest
   in bold at the bottom. With more than 9 changes only the newest 9 stay. A change is recorded
-  when the change indicator appears, so quick presses count as one entry.
+  2 seconds after a player's last press, so quick presses count as one entry.
 - **Stays awake:** while LifePoints is open, the device only goes to sleep after 20 minutes
   without a button press. A longer sleep setting (or "never") is kept.
 - The game state survives a quick trip to the home menu
@@ -77,7 +79,6 @@ Buttons 1–4 = the four front buttons **from left to right**.
 | Reset with the bottom side button | full |
 | History opens or closes | fast |
 | Life total changes | fast |
-| Change indicator appears | fast |
 | Skull / trophy appears | fast |
 | Button press with no effect (e.g. already at 0) | none |
 
@@ -94,7 +95,7 @@ The full-screen images show the device in portrait with the buttons at the botto
 |---|---|---|
 | Game in progress (bottom player just lost 6) | <img src="docs/lifepoints/screen_game.png" width="160"> | <img src="docs/lifepoints/view_game_bottom_player.png" width="300"> |
 | Top player reaches 0 | <img src="docs/lifepoints/screen_skull.png" width="160"> | <img src="docs/lifepoints/view_loser.png" width="300"> (loser) |
-| 2 seconds later | <img src="docs/lifepoints/screen_trophy.png" width="160"> | <img src="docs/lifepoints/view_winner.png" width="300"> (winner) |
+| 0.5 seconds later | <img src="docs/lifepoints/screen_trophy.png" width="160"> | <img src="docs/lifepoints/view_winner.png" width="300"> (winner) |
 
 History, as the bottom player sees it after losing 4 and then 5 (illustration of the layout;
 on the device it uses the CrossPoint UI font):
