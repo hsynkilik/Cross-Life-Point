@@ -28,7 +28,7 @@
   "description": "Two-player life counter for Flesh and Blood TCG on the Xteink X4 and X4 Pro e-ink reader, built into the open-source CrossPoint 2.0 firmware.",
   "url": "https://hsynkilik.github.io/Cross-Life-Point/",
   "downloadUrl": "https://github.com/hsynkilik/Cross-Life-Point/releases",
-  "softwareVersion": "1.1",
+  "softwareVersion": "1.1.1",
   "license": "https://opensource.org/licenses/MIT",
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}
 }
@@ -101,8 +101,9 @@ Cross-Life-Point is the open-source <a href="https://github.com/crosspoint-reade
 <h2>What LifePoints does</h2>
 <ul>
 <li>Two players, both start at <strong>40 life</strong>: Flesh and Blood Classic Constructed. It also fits Magic: The Gathering Commander and any other card game that tracks life.</li>
-<li><strong>Change indicator:</strong> 2 seconds after your last press, a small "−7" or "+2" under your total shows how much it changed. Quick presses are added up.</li>
-<li><strong>Game over:</strong> a skull with crossed bones and "YOU LOSE" at 0, then a trophy with rays and "YOU WIN" for the winner. Pressing + undoes a mistaken 0.</li>
+<li><strong>Change indicator:</strong> a small "−7" or "+2" under your total counts along while you press. Presses less than 2 seconds apart add up, and the number stays until your next round of presses.</li>
+<li style="list-style:none;margin:6px 0 10px"><img src="img/x4-counting.png" width="1300" height="360" style="max-width:100%;height:auto" alt="The small number counts along: -1, then -2, then -7 after a hold"></li>
+<li><strong>Game over:</strong> a skull with crossed bones and "YOU LOSE" at 0, then, half a second later, a trophy with rays and "YOU WIN" for the winner. Pressing + undoes a mistaken 0.</li>
 <li><strong>E-ink friendly:</strong> a full refresh only when opening and on reset, fast refresh otherwise, nothing redraws if nothing changed.</li>
 <li><strong>History per player:</strong> hold the top side button to see every change on your own half, from "Start 40" down to the newest change in bold. The newest 9 stay when the list gets long.</li>
 <li><strong>Stays awake for 20 minutes</strong> without input while LifePoints is open.</li>
@@ -187,13 +188,13 @@ function draw(){ctx.fillStyle='#e9e8e2';ctx.fillRect(0,0,cv.width,cv.height);ctx
 function zoneAt(x,y){const b=M+LN+KS,l=x<W/2;if(y>=H-b)return l?0:1;if(y<b)return l?2:3;return -1;}
 function toPortrait(e){const r=cv.getBoundingClientRect(),X=(e.clientX-r.left)*cv.width/r.width,Y=(e.clientY-r.top)*cv.height/r.height;return land?[W-Y,X]:[X,Y];}
 function updOver(now){const o=(life[0]==0)!=(life[1]==0);if(o&&!over){overSince=now;trophy=false;}else if(!o)trophy=false;over=o;}
-function apply(k,lng,now){const a=lng?5:1,b=[...life];if(k==0)life[1]=Math.max(0,life[1]-a);if(k==1)life[1]=Math.min(999,life[1]+a);if(k==2)life[0]=Math.min(999,life[0]+a);if(k==3)life[0]=Math.max(0,life[0]-a);const p=k<=1?1:0,ch=life[p]-b[p];if(!ch){st.textContent='No change (already at 0), so no refresh.';draw();return;}if(pendOn[p])pend[p]+=ch;else{pend[p]=ch;pendOn[p]=true;}shown[p]=0;last[p]=now;updOver(now);st.textContent=(p?'Bottom ':'Top ')+(ch>0?'+':'')+ch+(lng?' (held)':' (tapped)');draw();}
+function apply(k,lng,now){const a=lng?5:1,b=[...life];if(k==0)life[1]=Math.max(0,life[1]-a);if(k==1)life[1]=Math.min(999,life[1]+a);if(k==2)life[0]=Math.min(999,life[0]+a);if(k==3)life[0]=Math.max(0,life[0]-a);const p=k<=1?1:0,ch=life[p]-b[p];if(!ch){st.textContent='No change (already at 0), so no refresh.';draw();return;}if(pendOn[p])pend[p]+=ch;else{pend[p]=ch;pendOn[p]=true;}shown[p]=pend[p];last[p]=now;updOver(now);st.textContent=(p?'Bottom ':'Top ')+(ch>0?'+':'')+ch+(lng?' (held)':' (tapped)');draw();}
 cv.addEventListener('pointerdown',e=>{const[x,y]=toPortrait(e);zone=zoneAt(x,y);if(zone<0){st.textContent='Locked: only the four framed fields react.';return;}inZone=true;down[zone]=true;start[zone]=performance.now();cv.setPointerCapture(e.pointerId);draw();});
 cv.addEventListener('pointermove',e=>{if(zone<0)return;const[x,y]=toPortrait(e);const now=zoneAt(x,y)==zone;if(now!=inZone){inZone=now;draw();}});
 cv.addEventListener('pointerup',()=>{if(zone<0)return;const z=zone,now=performance.now(),ok=inZone;zone=-1;down[z]=false;if(ok)apply(z,now-start[z]>=600,now);else{st.textContent='Cancelled: the finger left the field.';draw();}});
 document.getElementById('rot').onclick=()=>{land=!land;setup();};
 document.getElementById('reset').onclick=()=>{life=[40,40];pend=[0,0];pendOn=[false,false];shown=[0,0];updOver(performance.now());draw();st.textContent='Reset to 40/40.';};
-setInterval(()=>{const now=performance.now();let ch=false;for(let p=0;p<2;p++){const kd=p==1?(down[0]||down[1]):(down[2]||down[3]);if(kd)continue;if(pendOn[p]&&now-last[p]>=2000){pendOn[p]=false;if(pend[p]){shown[p]=pend[p];ch=true;}}}if(over&&!trophy&&now-overSince>=2000){trophy=true;ch=true;}if(ch)draw();},50);
+setInterval(()=>{const now=performance.now();let ch=false;for(let p=0;p<2;p++){const kd=p==1?(down[0]||down[1]):(down[2]||down[3]);if(kd)continue;if(pendOn[p]&&now-last[p]>=2000){pendOn[p]=false;}}if(over&&!trophy&&now-overSince>=500){trophy=true;ch=true;}if(ch)draw();},50);
 setup();
 </script>
 </body>
