@@ -9,6 +9,9 @@ stays **unchanged**.
 
 Tested on: **Xteink X4** (ESP32-C3, 800×480 e-ink, 16 MB flash).
 
+> **Made with AI.** LifePoints was built with [Claude](https://claude.ai), Anthropic's AI assistant,
+> guided and reviewed by the project owner, and **tested on a real Xteink X4**.
+
 This is an unofficial fork. It is not supported by the CrossPoint team.
 
 <p>
