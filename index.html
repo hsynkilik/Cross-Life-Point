@@ -79,6 +79,7 @@ footer{border-top:1px solid var(--line);margin-top:56px;padding-top:20px;font-si
 <p class="sub">Crosspoint 2.0 + Lifepoint Counter</p>
 <p><strong>A Flesh and Blood life counter for the Xteink X4 and X4 Pro e-ink reader.</strong>
 Cross-Life-Point is the open-source <a href="https://github.com/crosspoint-reader/crosspoint-reader">CrossPoint Reader</a> 2.0 firmware with one extra menu entry, LifePoints: a two-player life tracker on the e-paper screen. Your e-reader stays a full e-reader.</p>
+<p style="font-size:.95em;opacity:.85"><strong>Made with AI, tested on real hardware:</strong> LifePoints was built with <a href="https://claude.ai">Claude</a>, Anthropic's AI assistant, guided and reviewed by the project owner, and tested on a real Xteink X4.</p>
 <div class="btns">
 <a class="btn primary" href="https://github.com/hsynkilik/Cross-Life-Point/releases">Download firmware</a>
 <a class="btn" href="#demo">Try the demo</a>
@@ -161,10 +162,11 @@ esptool --chip esp32c3 write-flash 0x10000 custom.bin</pre>
 <details><summary>Does it work on the Xteink X4 Pro?</summary><p>There is a touch version for the X4 Pro. It is built and checked, but not yet tested on a real device. Feedback is welcome on GitHub.</p></details>
 <details><summary>Can I see who lost how much?</summary><p>Yes. Hold the top side button for 1 second. Each half shows that player's own history: every change and the new total, newest at the bottom. Resetting clears it.</p></details>
 <details><summary>Why not press two buttons at once to reset?</summary><p>On the X4 all four front buttons share one analog input, so two buttons pressed together read as one wrong button. Holding a side button is reliable.</p></details>
+<details><summary>Was this made with AI?</summary><p>Yes. The LifePoints code, the screen renders and this website were built with Claude, Anthropic's AI assistant, guided and reviewed by the project owner. The X4 version was tested on a real device; the X4 Pro version is not tested on hardware yet.</p></details>
 <details><summary>Is this an official CrossPoint project?</summary><p>No. It's an unofficial fork, not supported by the CrossPoint team. All credit for the reader firmware goes to the CrossPoint contributors.</p></details>
 
 <footer>
-Cross-Life-Point (Crosspoint 2.0 + Lifepoint Counter) · Unofficial fork of <a href="https://github.com/crosspoint-reader/crosspoint-reader">CrossPoint Reader</a> · <a href="https://github.com/hsynkilik/Cross-Life-Point">GitHub</a> · Flesh and Blood is a trademark of Legend Story Studios; this project is not affiliated with it.
+Cross-Life-Point (Crosspoint 2.0 + Lifepoint Counter) · Unofficial fork of <a href="https://github.com/crosspoint-reader/crosspoint-reader">CrossPoint Reader</a> · <a href="https://github.com/hsynkilik/Cross-Life-Point">GitHub</a> · Made with Claude (AI), tested on a real Xteink X4 · Flesh and Blood is a trademark of Legend Story Studios; this project is not affiliated with it.
 </footer>
 </main>
 <script>
