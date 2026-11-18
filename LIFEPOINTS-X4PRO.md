@@ -5,6 +5,10 @@
 > For the button-based Xteink X4, use the `lifepoints` branch and its releases instead
 > ([LIFEPOINTS.md](./LIFEPOINTS.md)).
 
+> **Made with AI.** LifePoints was built with [Claude](https://claude.ai), Anthropic's AI assistant,
+> guided and reviewed by the project owner. It was **tested on a real Xteink X4**; this touch
+> version for the X4 Pro is not tested on a device yet.
+
 The X4 Pro has a touchscreen, a capacitive Home key, two small nav buttons and no front
 buttons. This branch (`lifepoints-x4pro`) adds touch controls to LifePoints. Everything else in
 CrossPoint stays unchanged, and on a device without touch the code behaves exactly like
