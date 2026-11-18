@@ -41,8 +41,10 @@ while LifePoints is open. The frontlight can still be switched with the power bu
 Everything else works like the X4 version:
 
 - Both players start at 40.
-- 2 seconds after a player's last press, a small "−6" / "+2" under the total shows the change.
-- A player at 0 gets a skull with crossed bones and "YOU LOSE"; 2 seconds later the other
+- A small "−6" / "+2" under the total counts along while a player taps (−1, −2, …). Taps less
+  than 2 seconds apart add up; the number stays until that player's next round of taps.
+  The history records the sum 2 seconds after the last tap.
+- A player at 0 gets a skull with crossed bones and "YOU LOSE"; half a second later the other
   player gets a trophy with rays and "YOU WIN".
 - Full refresh only when opening LifePoints and on reset; fast refresh otherwise.
 - **History per player:** each half shows that player's own changes, "Start 40" at the top,
@@ -59,7 +61,7 @@ the case still has to be confirmed on a real X4 Pro.
 |---|---|---|
 | Game in progress (bottom player just lost 6) | <img src="docs/lifepoints/x4pro/screen_game.png" width="160"> | <img src="docs/lifepoints/x4pro/view_game_bottom_player.png" width="300"> |
 | Top player reaches 0 | <img src="docs/lifepoints/x4pro/screen_skull.png" width="160"> | <img src="docs/lifepoints/x4pro/view_loser.png" width="300"> (loser) |
-| 2 seconds later | <img src="docs/lifepoints/x4pro/screen_trophy.png" width="160"> | <img src="docs/lifepoints/x4pro/view_winner.png" width="300"> (winner) |
+| 0.5 seconds later | <img src="docs/lifepoints/x4pro/screen_trophy.png" width="160"> | <img src="docs/lifepoints/x4pro/view_winner.png" width="300"> (winner) |
 | History (hold Right 1 s) | | <img src="docs/lifepoints/x4pro/view_history.png" width="300"> (bottom player lost 4, then 5) |
 
 The minus signs in the circles run along the short side of the screen, so they read as a

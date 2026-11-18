@@ -13,10 +13,10 @@
 // newest 9). Hold the bottom side key 2 s: reset both to 40 and clear the
 // history. Sleep only after 20 min without input. Short presses 1,4,1,4 within 3 s:
 // undo those four presses and return home.
-// 2 s after a player's last press, a small "+N"/"-N" under the total shows the
-// sum of that burst of presses; it stays until that player changes again.
+// A small "+N"/"-N" under the total counts along with a burst of presses
+// (presses less than 2 s apart) and stays until that player's next burst.
 // The screen only refreshes when a total or a shown change actually changes.
-// A player at 0 gets a skull ("YOU LOSE") at once; 2 s later the other player
+// A player at 0 gets a skull ("YOU LOSE") at once; 0.5 s later the other player
 // gets a trophy with rays ("YOU WIN").
 // Touch boards (X4 Pro): tap the +/- band at either end instead of the front
 // keys (- on each player's left, + on their right; hold = 5), hold a Left/Right
