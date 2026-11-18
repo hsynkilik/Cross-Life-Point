@@ -6,6 +6,7 @@
 > was built with [Claude](https://claude.ai), Anthropic's AI assistant, guided and reviewed by the
 > project owner. It was **tested on a real Xteink X4**. The X4 Pro build has not been tested on a
 > device yet.
+
 Cross-Life-Point is the open-source [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader)
 2.0 firmware with one extra menu entry, **LifePoints**: a two-player life tracker on the e-paper
 screen. No phone on the table, no glowing screen, weeks of battery, and your e-reader stays a
